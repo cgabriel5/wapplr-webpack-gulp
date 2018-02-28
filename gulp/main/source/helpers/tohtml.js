@@ -200,8 +200,9 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 				fileModifier: function(file, contents) {
 					// Path offsets.
 					var fpath = "../../favicon/";
-					// Get file name.
+					// Get file name + relative file path.
 					var filename = path.basename(file.path);
+					var filename_rel = path.relative($paths.cwd, file.path);
 
 					// Linkify URLs when the flag is provided.
 					if (linkify) {
@@ -268,7 +269,16 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
     <!-- https://github.com/sindresorhus/github-markdown-css -->
 	<style>${__markdown_styles}</style>
 </head>
-    <body class="markdown-body">${contents}${bs_script}
+    <body>
+		<h3 class="github-heading">
+			<svg aria-hidden="true" class="octicon octicon-book" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+				<path fill-rule="evenodd" d="M3 5h4v1H3V5zm0 3h4V7H3v1zm0 2h4V9H3v1zm11-5h-4v1h4V5zm0 2h-4v1h4V7zm0 2h-4v1h4V9zm2-6v9c0 .55-.45 1-1 1H9.5l-1 1-1-1H2c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h5.5l1 1 1-1H15c.55 0 1 .45 1 1zm-8 .5L7.5 3H2v9h6V3.5zm7-.5H9.5l-.5.5V12h6V3z">
+				</path>
+			</svg>
+			${filename} <span class="github-heading-filepath">&mdash; ./${filename_rel}</span>
+		</h3>
+		<div class="markdown-body">${contents}</div>
+		${bs_script}
 	</body>
 </html>`;
 
