@@ -1,0 +1,37 @@
+{
+	"gulp": {
+		"source": {
+			"files": [
+				"requires.js",
+				"paths.js",
+				"preconfig.js",
+				"configs.js",
+				"vars.js",
+				"functions.js",
+				"tasks/init.js",
+				"helpers/tohtml.js",
+				"helpers/open.js",
+				"helpers/instance.js",
+				"helpers/pretty.js",
+				"helpers/eol.js",
+				"helpers/stats.js",
+				"helpers/files.js",
+				"helpers/make.js",
+				"helpers/lintjs.js",
+				"helpers/lintcss.js",
+				"helpers/linthtml.js",
+				"helpers/settings.js",
+				"helpers/indent.js",
+				"helpers/help.js"
+			],
+			"names": {
+				"default": "gulpfile.js",
+				"main": "gulpfile-main.js",
+				"setup": "gulpfile-setup.js"
+			}
+		},
+		"watch": {
+			"config": ["./configs/**/*.json"]
+		}
+	}
+}

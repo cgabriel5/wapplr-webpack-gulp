@@ -1,0 +1,32 @@
+{
+	// The name given to the identify the server.
+	// [https://browsersync.io/docs/api#api-create]
+	"name": "localhost",
+	// Clear all defaults & only use the options found in this file.
+	"clear": false,
+	// Auto close created tabs. Basically, when the browser-sync server
+	// closes all the tabs opened by browser-sync or the terminal will be
+	// auto closed. Tabs that are created manually (i.e. copy/pasting URL
+	// or typing out URL then hitting enter) cannot be auto closed due to
+	// security issues as noted here: [https://stackoverflow.com/q/19761241].
+	"auto_close_tabs": true,
+
+	// Place plugin options in this object.
+	// [https://browsersync.io/docs/api]
+	"plugin": {
+		// Options here will overwrite defaults.
+		//
+		// These are the defaults used:
+		//
+		// "browser": Defaults to chrome. Falling back to Firefox.
+		// "proxy": Built on the fly using the project location and
+		//  		information provided in app.cm.json.
+		// "port": Automatically finds a free port.
+		// "ui": {
+		// 	"port": Automatically finds a free port.
+		// },
+		// "notify": false,
+		// "open": true,
+		// "logPrefix": "BS"
+	}
+}

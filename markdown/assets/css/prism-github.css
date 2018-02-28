@@ -1,0 +1,126 @@
+/**
+ * GHColors theme by Avi Aryan (http://aviaryan.in)
+ * Inspired by Github syntax coloring
+ */
+
+code[class*="language-"],
+pre[class*="language-"] {
+	font-family: "Consolas", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
+	font-size: 0.95em;
+	line-height: 1.2em;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	-moz-tab-size: 4;
+	  -o-tab-size: 4;
+	     tab-size: 4;
+	-webkit-hyphens: none;
+	   -moz-hyphens: none;
+	    -ms-hyphens: none;
+	        hyphens: none;
+	color: #393a34;
+	direction: ltr;
+}
+
+pre[class*="language-"]::-moz-selection,
+code[class*="language-"]::-moz-selection {
+	background: #b3d4fc;
+}
+
+pre[class*="language-"]::selection,
+code[class*="language-"]::selection {
+	background: #b3d4fc;
+}
+
+/* Code blocks */
+
+pre[class*="language-"] {
+	overflow: auto;
+	margin: 0.5em 0;
+	padding: 1em;
+	border: 1px solid #dddddd;
+	background-color: white;
+}
+
+/* Inline code */
+
+:not(pre) > code[class*="language-"] {
+	padding: 1px 0.2em;
+	border: 1px solid #dddddd;
+	background: #f8f8f8;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: #999988;
+	/* font-style: italic; */
+}
+
+.token.namespace {
+	opacity: 0.7;
+}
+
+.token.string,
+.token.attr-value {
+	color: #e3116c;
+	color: #884815;
+}
+
+.token.punctuation,
+.token.operator {
+	color: #393a34;
+	/* no highlight */
+}
+
+.token.entity,
+.token.url,
+.token.symbol,
+.token.number,
+.token.boolean,
+.token.variable,
+.token.constant,
+.token.property,
+.token.regex,
+.token.inserted {
+	/* color: #36acaa; *//* color: #627E00; */
+	color: #aa0c91;
+}
+
+.token.atrule,
+.token.keyword,
+.token.attr-name,
+.language-autohotkey .token.selector {
+	color: #00a4db;
+	color: #aa0c91;
+}
+
+.token.class-name {
+	color: #6f42c1;
+}
+
+.token.function,
+.token.deleted,
+.language-autohotkey .token.tag {
+	color: #9a050f;
+	color: #6f42c1;
+}
+
+.token.tag,
+.token.selector,
+.language-autohotkey .token.keyword {
+	color: #00009f;
+	color: #aa0c91;
+}
+
+.token.important,
+.token.function,
+.token.bold {
+	/* font-weight: bold; */
+}
+
+.token.italic {
+	font-style: italic;
+}

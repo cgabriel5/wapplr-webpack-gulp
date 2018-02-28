@@ -1,0 +1,69 @@
+{
+	// [https://github.com/CSSLint/csslint/wiki/Rules]
+
+	"box-model": true, // Beware of box model size
+	"display-property-grouping": true, // Require properties appropriate for display
+	"duplicate-properties": true, // Disallow duplicate properties
+	"empty-rules": true, // Disallow empty rules
+	"known-properties": false, // Require use of known properties
+
+	// Compatibility
+	// The following rules flag for compatibility problems across browsers
+	// and browser settings.
+
+	"adjoining-classes": false, // Disallow adjoining classes
+	"box-sizing": false, // Disallow box-sizing
+	"compatible-vendor-prefixes": false, // Require compatible vendor prefixes
+	"gradients": false, // Require all gradient definitions
+	"text-indent": true, // Disallow negative text-indent
+	"vendor-prefix": true, // Require standard property with vendor prefix
+	"fallback-colors": false, // Require fallback colors
+	"star-property-hack": true, // Disallow star hack
+	"underscore-property-hack": true, // Disallow underscore hack
+	"bulletproof-font-face": false, // Bulletproof font-face (new in v0.9.10)
+
+	// Performance
+	// The following rules are aimed at improving CSS performance, including
+	// runtime performance and overall code size.
+
+	"font-faces": false, // Don't use too many web fonts
+	"import": true, // Disallow @import
+	"regex-selectors": false, // Disallow selectors that look like regular expressions
+	"universal-selector": false, // Disallow universal selector
+	"unqualified-attributes": false, // Disallow unqualified attribute selectors
+	"zero-units": true, // Disallow units for zero values
+	"overqualified-elements": true, // Disallow overqualified elements
+	"shorthand": true, // Require shorthand properties
+	"duplicate-background-images": true, // Disallow duplicate background images
+
+	// Maintainability & Duplication
+	// These rules help to ensure your code is readable and maintainable
+	// by others.
+
+	"floats": false, // Disallow too many floats
+	"font-sizes": false, // Don't use too many font-size declarations
+	"ids": true, // Disallow IDs in selectors
+	"important": true, // Disallow !important
+	"order-alphabetical": false, // Disallow non alphabetical
+
+	// Accessibility
+	// These rules are designed to pick out possible accessibility issues.
+
+	"outline-none": true, // Disallow outline: none
+
+	// OOCSS
+	// These rules are based on the principles of OOCSS.
+
+	"qualified-headings": true, // Disallow qualified headings
+	"unique-headings": true // Headings should only be defined once
+
+	// Wiki pages missing for some rules
+	// [https://github.com/CSSLint/csslint/issues/535]
+
+	// "errors": false,
+	// "order-alphabetical": false,
+	// "rules-count": false,
+	// "selector-max-approaching": false,
+	// "selector-max": false,
+	// "selector-newline": false
+}

@@ -1,0 +1,52 @@
+{
+	// The project address is the location that will be used when
+	// launching the project. For example, the address defaults to
+	// "localhost/projects/", minus the double quotes. This means
+	// that when the project is launched, it will launch at
+	// "http://localhost/projects/...", for example. This should be
+	// changes to follow your project's directory/localhost server
+	// configuration/structure.
+	"base": "localhost/projects/",
+
+	// The line ending style the project files should have.
+	// "Mac OS       (cr, \r)
+	// "Unix/OS X    (lf, \n)
+	// "Windows/DOS  (crlf, \r\n)
+	"eol": {
+		"ending": "\n",
+		"style": "lf"
+	},
+
+	// The project's entry point. This is the file that will be used
+	// when launching the project.
+	"index": "index.html",
+
+	// When launching the project should it be launched using HTTPS?
+	"https": false,
+
+	// When launching the project the default port used will be 80.
+	// Use a different port if needed.
+	"port": 80,
+
+	// The char used to indent project files. Tabs are used by default.
+	"indent_char": "\t",
+
+	// The text editor to use when opening files.
+	"editor": {
+		// Path of text editor binary.
+		"command": "",
+		// Any flags wished to be passed along with the command.
+		"flags": [],
+
+		// Example of what is could look like for a Linux system.
+		// "command": "subl",
+		// "args": ["--new-window", "--wait"]
+
+		// By default the project will look at the user's environment
+		// variables for default text editor information. If nothing is
+		// found vim or notepad will be used depending on the OS. Flag
+		// must be set to true to use this editor information or else
+		// environment variables will be used.
+		"active": false
+	}
+}

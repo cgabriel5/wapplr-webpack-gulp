@@ -1,0 +1,54 @@
+{
+	"design": {
+		"androidChrome": {
+			"assets": {
+				"legacyIcon": false,
+				"lowResolutionIcons": false
+			},
+			"backgroundColor": "#f6f5dd",
+			"manifest": {
+				"declared": true,
+				"display": "standalone",
+				"onConflict": "override",
+				"orientation": "notSet"
+			},
+			"margin": "42%",
+			"pictureAspect": "backgroundAndMargin",
+			"themeColor": "#f6f5dd"
+		},
+		"desktopBrowser": {},
+		"ios": {
+			"assets": {
+				"declareOnlyDefaultIcon": true,
+				"ios6AndPriorIcons": true,
+				"ios7AndLaterIcons": true,
+				"precomposedIcons": true
+			},
+			"backgroundColor": "#f6f5dd",
+			"margin": "53%",
+			"pictureAspect": "backgroundAndMargin"
+		},
+		"safariPinnedTab": {
+			"pictureAspect": "silhouette",
+			"themeColor": "#699935"
+		},
+		"windows": {
+			"assets": {
+				"windows10Ie11EdgeTiles": {
+					"big": true,
+					"medium": true,
+					"rectangle": true,
+					"small": true
+				},
+				"windows80Ie10Tile": true
+			},
+			"backgroundColor": "#00a300",
+			"onConflict": "override",
+			"pictureAspect": "whiteSilhouette"
+		}
+	},
+	"settings": {
+		"errorOnImageTooSmall": false,
+		"scalingAlgorithm": "Mitchell"
+	}
+}

@@ -1,0 +1,18 @@
+// [https://medium.com/@chanonroy/webpack-2-and-font-awesome-icon-importing-59df3364f35c]
+// [https://github.com/shakacode/font-awesome-loader/blob/master/docs/usage-webpack2.md]
+// [https://www.npmjs.com/package/font-awesome-webpack]
+// Import font-awesome into project.
+// $fa-font-path: "~font-awesome/fonts";
+// @import "~font-awesome/scss/font-awesome.scss";
+
+// Import Google fonts into project either using the Google font API URL
+// os simply make a file and import the file via SASS imports.
+// @import url("https://fonts.googleapis.com/css?family=Lato:300,400,700");
+@import "google-fonts.scss";
+
+body {
+	background: lightyellow;
+	font-family: Lato;
+	color: red;
+	font-size: 80px;
+}

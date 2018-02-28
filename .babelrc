@@ -1,0 +1,8 @@
+// Unfortunately babel does not allow a custom file path for a config
+// file. As seen here [https://github.com/babel/babel/issues/5689]. For
+// the time being the options are to make a ./babelrc file, have the
+// configuration in the package.json file, or make a repo and add the
+// config via the "extends" key. :[
+{
+  "presets": ["es2015"]
+}

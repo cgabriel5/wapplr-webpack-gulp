@@ -1,0 +1,97 @@
+{
+	// Distribution paths (only for apptype=webapp).
+	"dist_home": "dist/",
+
+	// Library paths (only for apptype=library).
+	"lib_home": "lib/",
+
+	// HTML paths.
+	"html_source": "${homedir}html/source/",
+
+	// CSS paths.
+	"css_source": "${homedir}css/source/",
+	"css_vendor": "${homedir}css/vendor/",
+	"css_bundles": "${homedir}css/bundles/",
+
+	// JS paths.
+	"js_source": "${homedir}js/source/",
+	"js_source_modules": "${homedir}js/source/modules/",
+	"js_vendor": "${homedir}js/vendor/",
+	"js_bundles": "${homedir}js/bundles/",
+
+	// Img paths.
+	"img_source": "${homedir}img/**/*.*",
+
+	// Gulp paths.
+	// "gulp_home": "${homedir}gulp/",
+	"gulp_source": "${homedir}gulp/main/source/",
+
+	// Markdown paths (tohtml:prepcss).
+	"markdown_preview": "${homedir}markdown/previews/",
+	"markdown_styles_github": "github-markdown.css",
+	"markdown_styles_prismjs": "prism-github.css",
+	"markdown_assets": "./markdown/assets/css/",
+	"markdown_concat_name": "markdown.css",
+
+	// Configuration file paths.
+	"config_home": "./${homedir}configs/",
+	"config_internal": "./${homedir}configs/.__internal.json",
+	"config_settings": "./${homedir}configs/.__settings.json",
+	"config_settings_json_files": "./${homedir}configs/**/*.json",
+	"config_settings_name": ".__settings.json",
+	"config_$realfavicongen": "realfavicongen",
+	"config_$perfectionist": "perfectionist",
+	"config_$findfreeport": "findfreeport",
+	"config_$autoprefixer": "autoprefixer",
+	"config_$favicondata": "favicondata",
+	"config_$browsersync": "browsersync.cm",
+	"config_$jsbeautify": "jsbeautify",
+	"config_$htmllint": "htmllint.cm",
+	"config_$modernizr": "modernizr",
+	"config_$csslint": "csslint.cm",
+	"config_$prettier": "prettier",
+	"config_$jshint": "jshint.cm",
+	"config_$bundles": "bundles",
+	"config_$csscomb": "csscomb",
+	"config_$app": "app.cm",
+
+	// Favicon paths.
+	"favicon_dest": "${homedir}favicon/",
+	"favicon_master_pic": "./${homedir}docs/brand/img/leaf-900.png",
+	"favicon_root_ico": "./${homedir}favicon/favicon.ico",
+	"favicon_root_png": "./${homedir}favicon/apple-touch-icon.png",
+	"favicon_root_config": "./${homedir}favicon/browserconfig.xml",
+	"favicon_root_manifest": "./${homedir}favicon/site.webmanifest",
+	"favicon_html": "./${homedir}html/source/head/favicon.html",
+	"favicon_html_dest": "./${homedir}html/source/head/",
+
+	// .git/ paths.
+	"git": ".git/",
+	"githead": ".git/head",
+
+	// node_modules/ paths.
+	"node_modules": "./node_modules/",
+	"node_modules_name": "node_modules/",
+	"browser_sync_pkg": "./${homedir}node_modules/browser-sync/package.json",
+
+	// Readme paths.
+	"readme": "readme.md",
+	"readme_html": "readme.html",
+
+	// Modernizr paths.
+	"vendor_modernizr": "./${homedir}js/vendor/modernizr/",
+	"modernizr_file_name": "modernizr.js",
+
+	// File paths.
+	"files_all": "**/*.*",
+	"files_min": "**/*.min.*",
+	"files_common": "**/*.{html,css,js,json}",
+	"files_code":
+		"**/*.{bat,coffee,css,htm,html,inc,ini,js,json,jsx,less,od,onlydata,php,pl,py,rb,sass,scm,scss,sh,sql,styl,tag,ts,tsx,xml,xhtml,markdown,md,mdwn,mdown,mkd,mkdn,mdtxt,mdtext,txt,text}",
+
+	// Negative file paths (exclude files w/ following in path).
+	"not_min": "!**/*.min.*",
+	"not_tests": "!**/test/**",
+	"not_vendor": "!**/vendor/**",
+	"not_ignore": "!**/*.ig.*"
+}
