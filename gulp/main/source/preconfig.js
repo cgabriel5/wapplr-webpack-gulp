@@ -1,3 +1,8 @@
+// Programmatically rebuild internal file when it does not exist.
+if (!fe.sync($paths.config_internal)) {
+	fs.writeFileSync($paths.config_internal, "{}");
+}
+
 // Dynamic configuration files (load via json-file to modify later).
 var $internal = json.read($paths.config_internal);
 
