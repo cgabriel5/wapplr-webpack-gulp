@@ -93,6 +93,7 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 
 	// Actual task starts here.
 
+	var marked = require("marked");
 	var prism = require("prismjs");
 	// Extend the default prismjs languages.
 	require("prism-languages");
@@ -125,7 +126,7 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 
 	// Make marked use prism for syntax highlighting.
 	// [https://github.com/krasimir/techy/issues/30#issuecomment-238850743]
-	$.marked.marked.setOptions({
+	marked.setOptions({
 		highlight: function(code, language) {
 			// Default to markup when language is undefined or get an error.
 			return prism.highlight(code, prism.languages[language || "markup"]);
@@ -186,6 +187,9 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 	// make a single request for it.
 	var bs_version = json.read($paths.browser_sync_pkg).data.version;
 
+	// Store the relative file path to open file in browser.
+	var __filename_rel;
+
 	// Run gulp process.
 	pump(
 		[
@@ -195,18 +199,26 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 				base: $paths.dot
 			}),
 			$.debug(),
-			$.marked(),
-			$.modify({
-				fileModifier: function(file, contents) {
+			// Run marked on the file.
+			$.foreach(function(stream, file) {
+				return marked(file.contents.toString(), {}, function(
+					err,
+					data
+				) {
+					if (err) {
+						return err;
+					}
+
 					// Path offsets.
 					var fpath = "../../favicon/";
 					// Get file name + relative file path.
 					var filename = path.basename(file.path);
-					var filename_rel = path.relative($paths.cwd, file.path);
+					// Store the relative file path for later use.
+					__filename_rel = path.relative($paths.cwd, file.path);
 
 					// Linkify URLs when the flag is provided.
 					if (linkify) {
-						contents = linkifier(contents);
+						data = linkifier(data);
 					}
 
 					// Where browser-sync script will be contained if
@@ -275,9 +287,9 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 				<path fill-rule="evenodd" d="M3 5h4v1H3V5zm0 3h4V7H3v1zm0 2h4V9H3v1zm11-5h-4v1h4V5zm0 2h-4v1h4V7zm0 2h-4v1h4V9zm2-6v9c0 .55-.45 1-1 1H9.5l-1 1-1-1H2c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h5.5l1 1 1-1H15c.55 0 1 .45 1 1zm-8 .5L7.5 3H2v9h6V3.5zm7-.5H9.5l-.5.5V12h6V3z">
 				</path>
 			</svg>
-			${filename} <span class="github-heading-filepath">&mdash; ./${filename_rel}</span>
+			${filename} <span class="github-heading-filepath">&mdash; ./${__filename_rel}</span>
 		</h3>
-		<div class="markdown-body">${contents}</div>
+		<div class="markdown-body">${data}</div>
 		${bs_script}
 	</body>
 </html>`;
@@ -290,44 +302,40 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 					// However, I could not get this to work so script was
 					// gets created on the fly as shown below.
 
-					return template;
-				}
+					// Reset the file contents with the marked output.
+					file.contents = Buffer.from(template);
+
+					// Return the stream.
+					return stream;
+				});
 			}),
 			$.beautify(JSBEAUTIFY),
 			gulp.dest($paths.markdown_preview),
-			// Open the file when the open flag is provided.
-			$.gulpif(
-				open,
-				$.modify({
-					fileModifier: function(file, contents) {
-						// Note: fileModifier is being used here in a 'hacky'
-						// way. fileModifier is intended to modify the file's
-						// contents. However, the original file contents are
-						// being returned. fileModifier in this case is being
-						// used as a callback function to run the open task
-						// as a shell command.
-
-						// Get the converted HTML file name.
-						var filename_rel = path.relative($paths.cwd, file.path);
-
-						// Run the open task as a shell command to not
-						// re-write the task logic.
-						cmd.get(
-							`${GULPCLI} open --file ${filename_rel}`,
-							function(err) {
-								if (err) {
-									throw err;
-								}
-							}
-						);
-
-						return contents;
-					}
-				})
-			),
 			$.debug.edit(),
 			__bs.stream()
 		],
-		done
+		function() {
+			// Open the file in the browser when the open flag and the file
+			// path is set.
+			if (open && __filename_rel) {
+				// Make the file path.
+				var filepath = path.join(
+					$paths.markdown_preview,
+					__filename_rel
+				);
+
+				// Run the open task as a shell command to not re-write the
+				// task logic.
+				var command = `${GULPCLI} open --file ${filepath}`;
+				cmd.get(command, function(err) {
+					if (err) {
+						throw err;
+					}
+					done();
+				});
+			} else {
+				done();
+			}
+		}
 	);
 });
