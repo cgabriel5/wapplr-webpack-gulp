@@ -1230,7 +1230,11 @@ gulp.task("tohtml:prepcss", function(done) {
 	pump(
 		[
 			gulp.src(
-				[$paths.markdown_styles_github, $paths.markdown_styles_prismjs],
+				[
+					$paths.markdown_styles_github,
+					$paths.markdown_styles_prismjs,
+					$paths.markdown_styles_highlightjs
+				],
 				{
 					cwd: $paths.markdown_assets
 				}
@@ -1276,6 +1280,9 @@ gulp.task("tohtml:prepcss", function(done) {
  *     linkify URLs.
  */
 gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
+	var findup = require("find-up");
+	var cheerio = require("cheerio");
+
 	// Check the tohtml:prepcss variables before the actual task code runs.
 	if (__markdown_stopped) {
 		return done();
@@ -1284,6 +1291,62 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 	// Actual task starts here.
 
 	var marked = require("marked");
+	// Get reference
+	var renderer = new marked.Renderer();
+
+	// Extend the marked renderer:
+	// [https://github.com/markedjs/marked/blob/master/USAGE_EXTENSIBILITY.md]
+
+	// Add GitHub like anchors to headings.
+	// [https://github.com/markedjs/marked/blob/master/lib/marked.js#L822]
+	renderer.heading = function(text, level) {
+		var escaped_text = text.toLowerCase().replace(/[^\w]+/g, "-");
+
+		// Copy anchor SVG from GitHub.
+		return `
+		<h${level}>
+            <a href="#${escaped_text}" aria-hidden="true" class="anchor" name="${escaped_text}" id="${escaped_text}">
+				<svg aria-hidden="true" class="octicon octicon-link" height="16" version="1.1" viewBox="0 0 16 16" width="16">
+					<path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z">
+					</path>
+				</svg>
+            </a>
+            ${text}
+          </h${level}>\n`;
+	};
+
+	// Make checkboxes render like GitHub's.
+	// [https://github.com/markedjs/marked/blob/master/lib/marked.js#L844]
+	renderer.listitem = function(text, ordered) {
+		// Only change items that start with the following regexp.
+		var checkmark_item_pattern = /^\[(.*)\]/;
+
+		// Determine whether it's checked or not.
+		if (checkmark_item_pattern.test(text)) {
+			// Pattern captures the checkbox and its text.
+			var checkbox_pattern = /^\[(.*)\](.*)$/;
+
+			// Run pattern to get matches.
+			var matches = text.match(checkbox_pattern);
+
+			// Get the checkbox text content.
+			var text_content = matches[2].trim();
+
+			// Determine whether the checkbox is checked.
+			var checkbox_content = matches[1].trim();
+			// If the checkbox content is not empty it is checked.
+			var is_checked = checkbox_content ? 'checked="true"' : "";
+
+			return `
+			<li class="task-list-item">
+				<input ${is_checked}class="task-list-item-checkbox" disabled="" id="" type="checkbox"> ${text_content}
+			</li>\n`;
+		} else {
+			// Return the original text if not a checkbox item.
+			return "<li>" + text + "</li>\n";
+		}
+	};
+
 	var prism = require("prismjs");
 	// Extend the default prismjs languages.
 	require("prism-languages");
@@ -1301,12 +1364,19 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 		.option("linkify", {
 			alias: "l",
 			type: "boolean"
+		})
+		.option("highlighter", {
+			alias: "H",
+			type: "string"
 		}).argv;
 
 	// Get flag values.
 	var file = __flags.F || __flags.file;
 	var open = __flags.o || __flags.open;
 	var linkify = __flags.l || __flags.linkify;
+	var highlight = (__flags.H || __flags.highlight || "p")
+		.trim()
+		.toLowerCase();
 
 	// Task logic:
 	// - Get file markdown file contents.
@@ -1318,8 +1388,18 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 	// [https://github.com/krasimir/techy/issues/30#issuecomment-238850743]
 	marked.setOptions({
 		highlight: function(code, language) {
-			// Default to markup when language is undefined or get an error.
-			return prism.highlight(code, prism.languages[language || "markup"]);
+			// Determine what highlighter to use. Either prismjs or highlightjs.
+			if (highlight[0] === "h") {
+				// Use highlightjs.
+				return require("highlight.js").highlightAuto(code).value;
+			} else {
+				// Use prismjs.
+				// Default to markup when language is undefined or get an error.
+				return prism.highlight(
+					code,
+					prism.languages[language || "markup"]
+				);
+			}
 		}
 	});
 
@@ -1391,40 +1471,134 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 			$.debug(),
 			// Run marked on the file.
 			$.foreach(function(stream, file) {
-				return marked(file.contents.toString(), {}, function(
-					err,
-					data
-				) {
-					if (err) {
-						return err;
-					}
+				return marked(
+					file.contents.toString(),
+					{ renderer: renderer },
+					function(err, data) {
+						if (err) {
+							return err;
+						}
 
-					// Path offsets.
-					var fpath = "../../favicon/";
-					// Get file name + relative file path.
-					var filename = path.basename(file.path);
-					// Store the relative file path for later use.
-					__filename_rel = path.relative($paths.cwd, file.path);
+						// Path offsets.
+						var fpath = "../../favicon/";
+						// Get file name + relative file path.
+						var filename = path.basename(file.path);
+						// Store the relative file path for later use.
+						__filename_rel = path.relative($paths.cwd, file.path);
 
-					// Linkify URLs when the flag is provided.
-					if (linkify) {
-						data = linkifier(data);
-					}
+						// Linkify URLs when the flag is provided.
+						if (linkify) {
+							// Use cheerio to parse the HTML data.
+							var $ = cheerio.load(data);
 
-					// Where browser-sync script will be contained if
-					// a server instance is currently running.
-					var bs_script = "";
+							// Grab all anchor/img elements to modify their URL.
+							$("a, img").each(function(i, elem) {
+								// Cache the element.
+								var $el = $(this);
 
-					// Check internal file for a browser-sync local port.
-					var bs_local_port = get(
-						$internal.data,
-						"process.ports.local"
-					);
+								// Get the URL.
+								var attr_name =
+									elem.name === "a" ? "href" : "src";
+								var url = $el.attr(attr_name) || "";
+								// Lowercase the URL.
+								var url_lower = url.toLowerCase();
 
-					// If a browser-sync instance exists we populate the
-					// variable with the script injection code.
-					if (bs_local_port) {
-						bs_script = `<script>
+								// Only when the URL exists and does not start with a hash.
+								if (url && !url.startsWith("#")) {
+									// Non http(s) and scheme-less URLs.
+									if (
+										!(
+											url_lower.startsWith("htt") ||
+											url_lower.startsWith("//")
+										)
+									) {
+										// Reset the url by removing any starting dot,
+										// forward-slashes, and the .md extension.
+										url = url.replace(/^[\.\/]+/gi, "");
+
+										// Parse the path.
+										var parts = path.parse(url);
+										// Add a custom property to the parsed object.
+										// Property will hold anything after the file
+										// extension.
+										parts.trail = "";
+
+										// Get the file extension minus the starting dot.
+										var ext = parts.ext.slice(1);
+
+										// Check for a hash or a questions mark.
+										if (ext && /[^\w\d]+/i.test(ext)) {
+											// Get the index of the first non
+											// letter/number.
+											var special_char_index = ext.search(
+												/[^\w\d]/i
+											);
+
+											// If a non letter/number exists, get the extension
+											// by itself and everything after it.
+											if (-~special_char_index) {
+												parts.trail = `${ext.substring(
+													special_char_index,
+													ext.length
+												)}`;
+												parts.ext = `.${ext.substring(
+													0,
+													special_char_index
+												)}`;
+											}
+										}
+
+										// Get the absolute path of the file.
+										var findup_path = findup.sync(
+											`${path.join(
+												parts.dir,
+												parts.name + parts.ext
+											)}`
+										);
+										// When the file path does not exist
+										// findup returns null. In this case
+										// just return the original path.
+										var url_path = findup_path
+											? path.relative(
+													$paths.cwd,
+													findup_path
+												) + parts.trail
+											: url;
+
+										// Create the new resource HTTP URL.
+										url = uri({
+											appdir: APPDIR,
+											filepath: url_path,
+											https: HTTPS
+										});
+
+										// Set the new url.
+										$el.attr(attr_name, url);
+									}
+
+									// Open all links in their own tabs.
+									$el.attr("target", "_blank");
+								}
+							});
+
+							// Get the new HTML.
+							data = $.html();
+						}
+
+						// Where browser-sync script will be contained if
+						// a server instance is currently running.
+						var bs_script = "";
+
+						// Check internal file for a browser-sync local port.
+						var bs_local_port = get(
+							$internal.data,
+							"process.ports.local"
+						);
+
+						// If a browser-sync instance exists we populate the
+						// variable with the script injection code.
+						if (bs_local_port) {
+							bs_script = `<script>
 // [https://stackoverflow.com/a/8578840]
 (function(d, type, id) {
 	var source =
@@ -1447,9 +1621,9 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 	d.getElementsByTagName("body")[0].appendChild(el);
 })(document, "script", "__bs_script__");
 </script>`;
-					}
+						}
 
-					var template_meta = linkifier(`<meta charset="utf-8">
+						var template_meta = linkifier(`<meta charset="utf-8">
     <meta name="description" content="Markdown to HTML preview.">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -1463,7 +1637,7 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
     <meta name="msapplication-TileImage" content="${fpath}/mstile-144x144.png">
     <meta name="msapplication-config" content="${fpath}/browserconfig.xml">
     <meta name="theme-color" content="#f6f5dd">`);
-					var template = `<!doctype html>
+						var template = `<!doctype html>
 <html lang="en">
 <head>
     <title>${filename}</title>
@@ -1484,20 +1658,21 @@ gulp.task("tohtml", ["tohtml:prepcss"], function(done) {
 	</body>
 </html>`;
 
-					// Add browser-sync to the file. Tried to go this route:
-					// [Browsersync] Copy the following snippet into your website, just before the closing </body> tag
-					// <script id="__bs_script__">//<![CDATA[
-					//     document.write("<script async src='http://HOST:3000/browser-sync/browser-sync-client.js?v=2.20.0'><\/script>".replace("HOST", location.hostname));
-					// //]]></script>
-					// However, I could not get this to work so script was
-					// gets created on the fly as shown below.
+						// Add browser-sync to the file. Tried to go this route:
+						// [Browsersync] Copy the following snippet into your website, just before the closing </body> tag
+						// <script id="__bs_script__">//<![CDATA[
+						//     document.write("<script async src='http://HOST:3000/browser-sync/browser-sync-client.js?v=2.20.0'><\/script>".replace("HOST", location.hostname));
+						// //]]></script>
+						// However, I could not get this to work so script was
+						// gets created on the fly as shown below.
 
-					// Reset the file contents with the marked output.
-					file.contents = Buffer.from(template);
+						// Reset the file contents with the marked output.
+						file.contents = Buffer.from(template);
 
-					// Return the stream.
-					return stream;
-				});
+						// Return the stream.
+						return stream;
+					}
+				);
 			}),
 			$.beautify(JSBEAUTIFY),
 			gulp.dest($paths.markdown_preview),
@@ -1921,6 +2096,12 @@ gulp.task("pretty:gitfiles", function(done) {
  *     If provided, the file ending will get changed to provided
  *     character(s). Line endings default to LF ("\n").
  *
+ * -p, --cssprefix [boolean]
+ *     Autoprefixer CSS files.
+ *
+ * -u, --unprefix [boolean]
+ *     Unprefix CSS files.
+ *
  * $ gulp pretty
  *     Prettify all HTML, CSS, JS, JSON files.
  *
@@ -1947,6 +2128,12 @@ gulp.task("pretty:gitfiles", function(done) {
  *
  * $ gulp pretty --staged
  *     Performs a --quick prettification on Git staged files.
+ *
+ * $ gulp pretty --cssprefix
+ *     Prettify HTML, CSS, JS, JSON, and autoprefix CSS files.
+ *
+ * $ gulp pretty --unprefix
+ *     Prettify HTML, CSS, JS, JSON, and unprefix CSS files.
  */
 gulp.task("pretty", ["pretty:gitfiles"], function(done) {
 	var unprefix = require("postcss-unprefix");
@@ -1975,6 +2162,14 @@ gulp.task("pretty", ["pretty:gitfiles"], function(done) {
 			alias: "e",
 			type: "boolean"
 		})
+		.option("cssprefix", {
+			alias: "c",
+			type: "boolean"
+		})
+		.option("unprefix", {
+			alias: "u",
+			type: "boolean"
+		})
 		.option("line-ending", {
 			alias: "l",
 			type: "string"
@@ -1986,7 +2181,27 @@ gulp.task("pretty", ["pretty:gitfiles"], function(done) {
 	var ignores = __flags.i || __flags.ignore;
 	var test = __flags.test;
 	var empty = __flags.e || __flags.empty;
+	var cssprefix = __flags.cssprefix || __flags.c;
+	var remove_prefixes = __flags.unprefix || __flags.u;
 	var ending = __flags.l || __flags["line-ending"] || EOL_ENDING;
+
+	// By default CSS files will only be unprefixed and beautified. If needed
+	// files can also be autoprefixed when the --cssprefix/-p flag is used.
+	var css_plugins = [perfectionist(PERFECTIONIST)];
+
+	// To unprefix CSS files one of two things must happen. Either the
+	// unprefix or the cssprefix flag must be provided. The unprefix flag
+	// is self-explanatory but we also need to unprefix the code when the
+	// cssprefix flag is supplied to start the CSS prefixing from a clean
+	// unprefixd state.
+	if (remove_prefixes || cssprefix) {
+		css_plugins.unshift(unprefix());
+	}
+
+	// If the flag is provided, shorthand and autoprefix CSS.
+	if (cssprefix) {
+		css_plugins.splice(1, 0, shorthand(), autoprefixer(AUTOPREFIXER));
+	}
 
 	// Default globs: look for HTML, CSS, JS, and JSON files. They also
 	// exclude files containing a ".min." as this is the convention used
@@ -2111,15 +2326,7 @@ gulp.task("pretty", ["pretty:gitfiles"], function(done) {
 				return extension(file, ["html", "css"]) ? false : true;
 			}, $.prettier(PRETTIER)),
 			// Prettify CSS files.
-			$.gulpif(
-				extension.iscss,
-				$.postcss([
-					unprefix(),
-					shorthand(),
-					autoprefixer(AUTOPREFIXER),
-					perfectionist(PERFECTIONIST)
-				])
-			),
+			$.gulpif(extension.iscss, $.postcss(css_plugins)),
 			$.eol(ending),
 			$.debug.edit(),
 			gulp.dest($paths.basedir)
