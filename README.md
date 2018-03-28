@@ -35,7 +35,7 @@ This is a skeleton [`webpack`](https://webpack.js.org/) starter project that's w
 		- Create project favicons.
 		- Vue.js ready.
 	- Modify project as needed.
-- Fleshed out [`gulpfile.js`](/gulpfile-main.js) file.
+- Fleshed out [`gulpfile.js`](/gulpfile.js) file.
 	- Easily convert `.md` (`markdown`) files to their `.html` counterparts for previewing.
 	- File reload via [`BrowserSync`](https://www.browsersync.io/).
 		- Auto-detects free ports to use.
