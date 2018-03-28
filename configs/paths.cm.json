@@ -30,6 +30,7 @@
 	"markdown_preview": "${homedir}markdown/previews/",
 	"markdown_styles_github": "github-markdown.css",
 	"markdown_styles_prismjs": "prism-github.css",
+	"markdown_styles_highlightjs": "highlightjs.css",
 	"markdown_assets": "./markdown/assets/css/",
 	"markdown_concat_name": "markdown.css",
 
