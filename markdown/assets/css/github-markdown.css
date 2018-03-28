@@ -125,7 +125,8 @@
 }
 
 .markdown-body .pl-mi2 {
-	background-color: #f6f8fa;
+	/*background-color: #f6f8fa;*/
+	background-color: #fbfbfb;
 	background-color: #005cc5;
 }
 
@@ -592,7 +593,8 @@
 }
 
 .markdown-body table tr:nth-child(2n) {
-	background-color: #f6f8fa;
+	/*background-color: #f6f8fa;*/
+	background-color: #fbfbfb;
 }
 
 .markdown-body img {
@@ -645,8 +647,8 @@
 	overflow: auto;
 	padding: 16px;
 	border-radius: 3px;
-	/* Custom color */
-	background-color: #f6f8fa;
+	/* Custom color *//*background-color: #f6f8fa;*/
+	background-color: #fbfbfb;
 }
 
 .markdown-body pre code {
@@ -673,6 +675,7 @@
 .markdown-body pre code {
 	color: #333333;
 	/*background: #f6f8fa;*/
+	background: #fbfbfb;
 }
 
 .markdown-body pre code::before,
@@ -756,7 +759,8 @@ svg:not(:root) {
 .github-heading {
 	display: block;
 	padding: 9px 10px 10px;
-	background-color: #f6f8fa;
+	/*background-color: #f6f8fa;*/
+	background-color: #fbfbfb;
 	border: 1px solid rgba(27, 31, 35, 0.15);
 	border-bottom: 0;
 	border-radius: 3px 3px 0 0;
@@ -785,5 +789,21 @@ svg:not(:root) {
 @media (max-width: 767px) {
 	.markdown-body {
 		padding: 15px;
+	}
+}
+
+@media (max-width: 1000px) {
+	.markdown-body {
+		margin: auto auto 0;
+		border: none;
+	}
+
+	.github-heading {
+		margin: 0 auto auto;
+		border: none;
+	}
+
+	body {
+		margin: 0;
 	}
 }
