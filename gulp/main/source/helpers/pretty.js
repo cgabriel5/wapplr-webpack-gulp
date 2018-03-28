@@ -98,6 +98,12 @@ gulp.task("pretty:gitfiles", function(done) {
  *     If provided, the file ending will get changed to provided
  *     character(s). Line endings default to LF ("\n").
  *
+ * -p, --cssprefix [boolean]
+ *     Autoprefixer CSS files.
+ *
+ * -u, --unprefix [boolean]
+ *     Unprefix CSS files.
+ *
  * $ gulp pretty
  *     Prettify all HTML, CSS, JS, JSON files.
  *
@@ -124,6 +130,12 @@ gulp.task("pretty:gitfiles", function(done) {
  *
  * $ gulp pretty --staged
  *     Performs a --quick prettification on Git staged files.
+ *
+ * $ gulp pretty --cssprefix
+ *     Prettify HTML, CSS, JS, JSON, and autoprefix CSS files.
+ *
+ * $ gulp pretty --unprefix
+ *     Prettify HTML, CSS, JS, JSON, and unprefix CSS files.
  */
 gulp.task("pretty", ["pretty:gitfiles"], function(done) {
 	var unprefix = require("postcss-unprefix");
@@ -152,6 +164,14 @@ gulp.task("pretty", ["pretty:gitfiles"], function(done) {
 			alias: "e",
 			type: "boolean"
 		})
+		.option("cssprefix", {
+			alias: "c",
+			type: "boolean"
+		})
+		.option("unprefix", {
+			alias: "u",
+			type: "boolean"
+		})
 		.option("line-ending", {
 			alias: "l",
 			type: "string"
@@ -163,7 +183,27 @@ gulp.task("pretty", ["pretty:gitfiles"], function(done) {
 	var ignores = __flags.i || __flags.ignore;
 	var test = __flags.test;
 	var empty = __flags.e || __flags.empty;
+	var cssprefix = __flags.cssprefix || __flags.c;
+	var remove_prefixes = __flags.unprefix || __flags.u;
 	var ending = __flags.l || __flags["line-ending"] || EOL_ENDING;
+
+	// By default CSS files will only be unprefixed and beautified. If needed
+	// files can also be autoprefixed when the --cssprefix/-p flag is used.
+	var css_plugins = [perfectionist(PERFECTIONIST)];
+
+	// To unprefix CSS files one of two things must happen. Either the
+	// unprefix or the cssprefix flag must be provided. The unprefix flag
+	// is self-explanatory but we also need to unprefix the code when the
+	// cssprefix flag is supplied to start the CSS prefixing from a clean
+	// unprefixd state.
+	if (remove_prefixes || cssprefix) {
+		css_plugins.unshift(unprefix());
+	}
+
+	// If the flag is provided, shorthand and autoprefix CSS.
+	if (cssprefix) {
+		css_plugins.splice(1, 0, shorthand(), autoprefixer(AUTOPREFIXER));
+	}
 
 	// Default globs: look for HTML, CSS, JS, and JSON files. They also
 	// exclude files containing a ".min." as this is the convention used
@@ -288,15 +328,7 @@ gulp.task("pretty", ["pretty:gitfiles"], function(done) {
 				return extension(file, ["html", "css"]) ? false : true;
 			}, $.prettier(PRETTIER)),
 			// Prettify CSS files.
-			$.gulpif(
-				extension.iscss,
-				$.postcss([
-					unprefix(),
-					shorthand(),
-					autoprefixer(AUTOPREFIXER),
-					perfectionist(PERFECTIONIST)
-				])
-			),
+			$.gulpif(extension.iscss, $.postcss(css_plugins)),
 			$.eol(ending),
 			$.debug.edit(),
 			gulp.dest($paths.basedir)
