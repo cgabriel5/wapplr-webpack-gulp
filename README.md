@@ -7,7 +7,7 @@
 </div> -->
 <p align="center"><img src="/docs/branding/wapplr/bundled.png?raw=true" alt="logo-text" width="25%"></p>
 <p align="center"><img src="/docs/branding/wapplr/text.png?raw=true" alt="logo-text" width="25%"></p>
-<p align="center"><code><b>w</b>eb-<b>app</b>-boi<b>l</b>e<b>r</b></code> is an easy-to-use boilerplate and tooling solution.</p>
+<p align="center"><code><b>w</b>eb-<b>app</b>-boi<b>l</b>e<b>r</b></code> is a web development boilerplate and tooling solution that uses webpack and Gulp.</p>
 <h1></h1>
 
 ### Overview
